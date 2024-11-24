@@ -1,0 +1,315 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Right Triangle Calculator</title>
+        <link
+            href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css"
+            rel="stylesheet"
+        />
+        <style>
+            body {
+                background-color: #212529;
+                color: #f8f9fa;
+            }
+
+            .triangle-container {
+                position: relative;
+                width: 300px;
+                height: 300px;
+                margin: 2rem auto;
+            }
+
+            .side {
+                position: absolute;
+                background: #495057;
+                transition: all 0.3s;
+                cursor: pointer;
+            }
+
+            .side:hover {
+                background: #0d6efd;
+            }
+
+            #sideA {
+                width: 4px;
+                height: 300px;
+                left: 0;
+                top: 0;
+            }
+
+            #sideB {
+                width: 300px;
+                height: 4px;
+                left: 0;
+                bottom: 0;
+            }
+
+            #sideC {
+                width: 4px;
+                height: 424px;
+                left: 300px;
+                top: -124px;
+                transform: rotate(-45deg);
+                transform-origin: bottom left;
+            }
+
+            .angle {
+                position: absolute;
+                width: 30px;
+                height: 30px;
+                cursor: pointer;
+                transition: all 0.3s;
+            }
+
+            .angle:hover {
+                color: #0d6efd;
+            }
+
+            #angleA {
+                bottom: -15px;
+                right: -15px;
+            }
+
+            #angleA::after {
+                content: "α";
+                font-size: 20px;
+            }
+
+            #angleB {
+                bottom: -15px;
+                left: -15px;
+            }
+
+            #angleB::after {
+                content: "90°";
+                color: #495057;
+            }
+
+            #angleC {
+                top: -15px;
+                left: -15px;
+            }
+
+            #angleC::after {
+                content: "β";
+                font-size: 20px;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container mt-5">
+            <h1 class="text-center mb-4">Triangle Values Calculator</h1>
+
+            <div class="row g-3 mb-4">
+                <div class="col-md-4">
+                    <label class="form-label">Side a</label>
+                    <input
+                        type="number"
+                        class="form-control bg-dark text-light"
+                        id="inputA"
+                        placeholder="Enter length"
+                    />
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Side b</label>
+                    <input
+                        type="number"
+                        class="form-control bg-dark text-light"
+                        id="inputB"
+                        placeholder="Enter length"
+                    />
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Side c</label>
+                    <input
+                        type="number"
+                        class="form-control bg-dark text-light"
+                        id="inputC"
+                        placeholder="Enter length"
+                    />
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Angle α</label>
+                    <input
+                        type="number"
+                        class="form-control bg-dark text-light"
+                        id="inputAlpha"
+                        placeholder="Enter angle"
+                    />
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Angle β</label>
+                    <input
+                        type="number"
+                        class="form-control bg-dark text-light"
+                        id="inputBeta"
+                        placeholder="Enter angle"
+                    />
+                </div>
+            </div>
+
+            <div class="triangle-container">
+                <div
+                    id="sideA"
+                    class="side"
+                    onclick="calculate('a')"
+                    title="Side a"
+                ></div>
+                <div
+                    id="sideB"
+                    class="side"
+                    onclick="calculate('b')"
+                    title="Side b"
+                ></div>
+                <div
+                    id="sideC"
+                    class="side"
+                    onclick="calculate('c')"
+                    title="Side c"
+                ></div>
+                <div
+                    id="angleA"
+                    class="angle"
+                    onclick="calculate('alpha')"
+                    title="Angle α"
+                ></div>
+                <div id="angleB" class="angle" title="90°"></div>
+                <div
+                    id="angleC"
+                    class="angle"
+                    onclick="calculate('beta')"
+                    title="Angle β"
+                ></div>
+            </div>
+
+            <div
+                id="result"
+                class="alert alert-info mt-4"
+                style="display: none"
+            ></div>
+        </div>
+
+        <script>
+            function calculate(target) {
+                // Get our input values
+                const a = parseFloat(document.getElementById("inputA").value);
+                const b = parseFloat(document.getElementById("inputB").value);
+                const c = parseFloat(document.getElementById("inputC").value);
+                const alpha = parseFloat(
+                    document.getElementById("inputAlpha").value,
+                );
+                const beta = parseFloat(
+                    document.getElementById("inputBeta").value,
+                );
+
+                // Pick our result element and make it visible
+                const result = document.getElementById("result");
+                result.style.display = "block";
+
+                try {
+                    // "What are we solving again?"
+                    switch (target) {
+                        // Takes the target side and goes through possible calculations
+                        // If none have enough essential info to solve it - let the user know
+
+                        case "a":
+                            // Pythagorovka
+                            if (b && c) {
+                                const calcA = Math.sqrt(c * c - b * b);
+                                result.textContent = `Side a = ${calcA.toFixed(2)}`;
+
+                                // Vypocet pomoci strana, uhel
+                            } else if (b && alpha) {
+                                const calcA =
+                                    b * Math.tan((alpha * Math.PI) / 180);
+                                result.textContent = `Side a = ${calcA.toFixed(2)}`;
+                            } else if (c && beta) {
+                                const calcA =
+                                    c * Math.cos((beta * Math.PI) / 180);
+                                result.textContent = `Side a = ${calcA.toFixed(2)}`;
+
+                                // Chybi nam udaje
+                            } else {
+                                result.textContent =
+                                    "Need more info to calculate side a";
+                            }
+                            break;
+                        case "b":
+                            if (a && c) {
+                                const calcB = Math.sqrt(c * c - a * a);
+                                result.textContent = `Side b = ${calcB.toFixed(2)}`;
+                            } else if (a && alpha) {
+                                const calcB =
+                                    a / Math.tan((alpha * Math.PI) / 180);
+                                result.textContent = `Side b = ${calcB.toFixed(2)}`;
+                            } else if (c && alpha) {
+                                const calcB =
+                                    c * Math.cos((alpha * Math.PI) / 180);
+                                result.textContent = `Side b = ${calcB.toFixed(2)}`;
+                            } else {
+                                result.textContent =
+                                    "Need more info to calculate side b";
+                            }
+                            break;
+                        case "c":
+                            if (a && b) {
+                                const calcC = Math.sqrt(a * a + b * b);
+                                result.textContent = `Side c = ${calcC.toFixed(2)}`;
+                            } else if (a && alpha) {
+                                const calcC =
+                                    a / Math.sin((alpha * Math.PI) / 180);
+                                result.textContent = `Side c = ${calcC.toFixed(2)}`;
+                            } else if (b && beta) {
+                                const calcC =
+                                    b / Math.cos((beta * Math.PI) / 180);
+                                result.textContent = `Side c = ${calcC.toFixed(2)}`;
+                            } else {
+                                result.textContent =
+                                    "Need more info to calculate side c";
+                            }
+                            break;
+                        case "alpha":
+                            if (a && b) {
+                                const calcAlpha =
+                                    (Math.atan(a / b) * 180) / Math.PI;
+                                result.textContent = `Angle α = ${calcAlpha.toFixed(2)}°`;
+                            } else if (a && c) {
+                                const calcAlpha =
+                                    (Math.asin(a / c) * 180) / Math.PI;
+                                result.textContent = `Angle α = ${calcAlpha.toFixed(2)}°`;
+                            } else if (beta) {
+                                const calcAlpha = 90 - beta;
+                                result.textContent = `Angle α = ${calcAlpha.toFixed(2)}°`;
+                            } else {
+                                result.textContent =
+                                    "Need more info to calculate angle α";
+                            }
+                            break;
+                        case "beta":
+                            if (b && c) {
+                                const calcBeta =
+                                    (Math.acos(b / c) * 180) / Math.PI;
+                                result.textContent = `Angle β = ${calcBeta.toFixed(2)}°`;
+                            } else if (a && b) {
+                                const calcBeta =
+                                    (Math.atan(b / a) * 180) / Math.PI;
+                                result.textContent = `Angle β = ${calcBeta.toFixed(2)}°`;
+                            } else if (alpha) {
+                                const calcBeta = 90 - alpha;
+                                result.textContent = `Angle β = ${calcBeta.toFixed(2)}°`;
+                            } else {
+                                result.textContent =
+                                    "Need more info to calculate angle β";
+                            }
+                            break;
+                    }
+                } catch (error) {
+                    result.textContent =
+                        "Error on line 4552.. Check your input.";
+                }
+            }
+        </script>
+    </body>
+</html>
