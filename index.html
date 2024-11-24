@@ -102,84 +102,38 @@
         <div class="container mt-5">
             <h1 class="text-center mb-4">Triangle Values Calculator</h1>
 
-            <div class="row g-3 mb-4">
-                <div class="col-md-4">
-                    <label class="form-label">Side a</label>
-                    <input
-                        type="number"
-                        class="form-control bg-dark text-light"
-                        id="inputA"
-                        placeholder="Enter length"
-                    />
-                </div>
-                <div class="col-md-4">
-                    <label class="form-label">Side b</label>
-                    <input
-                        type="number"
-                        class="form-control bg-dark text-light"
-                        id="inputB"
-                        placeholder="Enter length"
-                    />
-                </div>
-                <div class="col-md-4">
-                    <label class="form-label">Side c</label>
-                    <input
-                        type="number"
-                        class="form-control bg-dark text-light"
-                        id="inputC"
-                        placeholder="Enter length"
-                    />
-                </div>
-                <div class="col-md-6">
-                    <label class="form-label">Angle α</label>
-                    <input
-                        type="number"
-                        class="form-control bg-dark text-light"
-                        id="inputAlpha"
-                        placeholder="Enter angle"
-                    />
-                </div>
-                <div class="col-md-6">
-                    <label class="form-label">Angle β</label>
-                    <input
-                        type="number"
-                        class="form-control bg-dark text-light"
-                        id="inputBeta"
-                        placeholder="Enter angle"
-                    />
-                </div>
-            </div>
+            <div class="row g-3 mb-4" id="inputForm"></div>
 
             <div class="triangle-container">
                 <div
                     id="sideA"
                     class="side"
-                    onclick="calculate('a')"
+                    data-target="a"
                     title="Side a"
                 ></div>
                 <div
                     id="sideB"
                     class="side"
-                    onclick="calculate('b')"
+                    data-target="b"
                     title="Side b"
                 ></div>
                 <div
                     id="sideC"
                     class="side"
-                    onclick="calculate('c')"
+                    data-target="c"
                     title="Side c"
                 ></div>
                 <div
                     id="angleA"
                     class="angle"
-                    onclick="calculate('alpha')"
+                    data-target="alpha"
                     title="Angle α"
                 ></div>
                 <div id="angleB" class="angle" title="90°"></div>
                 <div
                     id="angleC"
                     class="angle"
-                    onclick="calculate('beta')"
+                    data-target="beta"
                     title="Angle β"
                 ></div>
             </div>
@@ -192,124 +146,190 @@
         </div>
 
         <script>
-            function calculate(target) {
-                // Get our input values
-                const a = parseFloat(document.getElementById("inputA").value);
-                const b = parseFloat(document.getElementById("inputB").value);
-                const c = parseFloat(document.getElementById("inputC").value);
-                const alpha = parseFloat(
-                    document.getElementById("inputAlpha").value,
-                );
-                const beta = parseFloat(
-                    document.getElementById("inputBeta").value,
-                );
+            // Initialize the inputs and its attributes
+            const triangleInputs = [
+                { id: "a", label: "Side a", type: "side" },
+                { id: "b", label: "Side b", type: "side" },
+                { id: "c", label: "Side c", type: "side" },
+                { id: "alpha", label: "Angle α", type: "angle" },
+                { id: "beta", label: "Angle β", type: "angle" },
+            ];
 
-                // Pick our result element and make it visible
+            // Create an input field for each input
+            function createInputFields() {
+                const form = document.getElementById("inputForm");
+                triangleInputs.forEach((input) => {
+                    const col = document.createElement("div");
+                    col.className = "col-md-4";
+                    col.innerHTML = `
+                                    <label class="form-label">${input.label}</label>
+                                    <input
+                                        type="number"
+                                        class="form-control bg-dark text-light"
+                                        id="input${input.id.charAt(0).toUpperCase() + input.id.slice(1)}"
+                                        placeholder="Enter ${input.type}"
+                                    />
+                                `; // The id works like this= takes first letter and upper cases it,
+                    //then it slices the string after the first letter and append
+                    // the second part, if its just "a" theres nothing to add and the result is
+                    // "A"
+                    // otherwise its "A" + "lpha" ..for example
+
+                    // Adds the element into "col" div
+                    form.appendChild(col);
+                });
+            }
+
+            // Get our input values
+            function getInputValues() {
+                return {
+                    a: parseFloat(document.getElementById("inputA").value),
+                    b: parseFloat(document.getElementById("inputB").value),
+                    c: parseFloat(document.getElementById("inputC").value),
+                    alpha: parseFloat(
+                        document.getElementById("inputAlpha").value,
+                    ),
+                    beta: parseFloat(
+                        document.getElementById("inputBeta").value,
+                    ),
+                };
+            }
+
+            const calculatorMethods = {
+                a: {
+                    fromBC: (b, c) => Math.sqrt(c * c - b * b),
+                    fromBAlpha: (b, alpha) =>
+                        b * Math.tan((alpha * Math.PI) / 180),
+                    fromCBeta: (c, beta) =>
+                        c * Math.cos((beta * Math.PI) / 180),
+                },
+                b: {
+                    fromAC: (a, c) => Math.sqrt(c * c - a * a),
+                    fromAAlpha: (a, alpha) =>
+                        a / Math.tan((alpha * Math.PI) / 180),
+                    fromCAlpha: (c, alpha) =>
+                        c * Math.cos((alpha * Math.PI) / 180),
+                },
+                c: {
+                    fromAB: (a, b) => Math.sqrt(a * a + b * b),
+                    fromAAlpha: (a, alpha) =>
+                        a / Math.sin((alpha * Math.PI) / 180),
+                    fromBBeta: (b, beta) =>
+                        b / Math.cos((beta * Math.PI) / 180),
+                },
+                alpha: {
+                    fromAB: (a, b) => (Math.atan(a / b) * 180) / Math.PI,
+                    fromAC: (a, c) => (Math.asin(a / c) * 180) / Math.PI,
+                    fromBeta: (beta) => 90 - beta,
+                },
+                beta: {
+                    fromBC: (b, c) => (Math.acos(b / c) * 180) / Math.PI,
+                    fromAB: (a, b) => (Math.atan(b / a) * 180) / Math.PI,
+                    fromAlpha: (alpha) => 90 - alpha,
+                },
+            };
+
+            function calculate(target) {
+                const values = getInputValues();
                 const result = document.getElementById("result");
                 result.style.display = "block";
 
                 try {
-                    // "What are we solving again?"
+                    const methods = calculatorMethods[target];
+                    let calculated;
+
                     switch (target) {
-                        // Takes the target side and goes through possible calculations
-                        // If none have enough essential info to solve it - let the user know
-
                         case "a":
-                            // Pythagorovka
-                            if (b && c) {
-                                const calcA = Math.sqrt(c * c - b * b);
-                                result.textContent = `Side a = ${calcA.toFixed(2)}`;
-
-                                // Vypocet pomoci strana, uhel
-                            } else if (b && alpha) {
-                                const calcA =
-                                    b * Math.tan((alpha * Math.PI) / 180);
-                                result.textContent = `Side a = ${calcA.toFixed(2)}`;
-                            } else if (c && beta) {
-                                const calcA =
-                                    c * Math.cos((beta * Math.PI) / 180);
-                                result.textContent = `Side a = ${calcA.toFixed(2)}`;
-
-                                // Chybi nam udaje
-                            } else {
-                                result.textContent =
-                                    "Need more info to calculate side a";
-                            }
+                            if (values.b && values.c)
+                                calculated = methods.fromBC(values.b, values.c);
+                            else if (values.b && values.alpha)
+                                calculated = methods.fromBAlpha(
+                                    values.b,
+                                    values.alpha,
+                                );
+                            else if (values.c && values.beta)
+                                calculated = methods.fromCBeta(
+                                    values.c,
+                                    values.beta,
+                                );
                             break;
                         case "b":
-                            if (a && c) {
-                                const calcB = Math.sqrt(c * c - a * a);
-                                result.textContent = `Side b = ${calcB.toFixed(2)}`;
-                            } else if (a && alpha) {
-                                const calcB =
-                                    a / Math.tan((alpha * Math.PI) / 180);
-                                result.textContent = `Side b = ${calcB.toFixed(2)}`;
-                            } else if (c && alpha) {
-                                const calcB =
-                                    c * Math.cos((alpha * Math.PI) / 180);
-                                result.textContent = `Side b = ${calcB.toFixed(2)}`;
-                            } else {
-                                result.textContent =
-                                    "Need more info to calculate side b";
-                            }
+                            if (values.a && values.c)
+                                calculated = methods.fromAC(values.a, values.c);
+                            else if (values.a && values.alpha)
+                                calculated = methods.fromAAlpha(
+                                    values.a,
+                                    values.alpha,
+                                );
+                            else if (values.c && values.alpha)
+                                calculated = methods.fromCAlpha(
+                                    values.c,
+                                    values.alpha,
+                                );
                             break;
                         case "c":
-                            if (a && b) {
-                                const calcC = Math.sqrt(a * a + b * b);
-                                result.textContent = `Side c = ${calcC.toFixed(2)}`;
-                            } else if (a && alpha) {
-                                const calcC =
-                                    a / Math.sin((alpha * Math.PI) / 180);
-                                result.textContent = `Side c = ${calcC.toFixed(2)}`;
-                            } else if (b && beta) {
-                                const calcC =
-                                    b / Math.cos((beta * Math.PI) / 180);
-                                result.textContent = `Side c = ${calcC.toFixed(2)}`;
-                            } else {
-                                result.textContent =
-                                    "Need more info to calculate side c";
-                            }
+                            if (values.a && values.b)
+                                calculated = methods.fromAB(values.a, values.b);
+                            else if (values.a && values.alpha)
+                                calculated = methods.fromAAlpha(
+                                    values.a,
+                                    values.alpha,
+                                );
+                            else if (values.b && values.beta)
+                                calculated = methods.fromBBeta(
+                                    values.b,
+                                    values.beta,
+                                );
                             break;
                         case "alpha":
-                            if (a && b) {
-                                const calcAlpha =
-                                    (Math.atan(a / b) * 180) / Math.PI;
-                                result.textContent = `Angle α = ${calcAlpha.toFixed(2)}°`;
-                            } else if (a && c) {
-                                const calcAlpha =
-                                    (Math.asin(a / c) * 180) / Math.PI;
-                                result.textContent = `Angle α = ${calcAlpha.toFixed(2)}°`;
-                            } else if (beta) {
-                                const calcAlpha = 90 - beta;
-                                result.textContent = `Angle α = ${calcAlpha.toFixed(2)}°`;
-                            } else {
-                                result.textContent =
-                                    "Need more info to calculate angle α";
-                            }
+                            if (values.a && values.b)
+                                calculated = methods.fromAB(values.a, values.b);
+                            else if (values.a && values.c)
+                                calculated = methods.fromAC(values.a, values.c);
+                            else if (values.beta)
+                                calculated = methods.fromBeta(values.beta);
                             break;
                         case "beta":
-                            if (b && c) {
-                                const calcBeta =
-                                    (Math.acos(b / c) * 180) / Math.PI;
-                                result.textContent = `Angle β = ${calcBeta.toFixed(2)}°`;
-                            } else if (a && b) {
-                                const calcBeta =
-                                    (Math.atan(b / a) * 180) / Math.PI;
-                                result.textContent = `Angle β = ${calcBeta.toFixed(2)}°`;
-                            } else if (alpha) {
-                                const calcBeta = 90 - alpha;
-                                result.textContent = `Angle β = ${calcBeta.toFixed(2)}°`;
-                            } else {
-                                result.textContent =
-                                    "Need more info to calculate angle β";
-                            }
+                            if (values.b && values.c)
+                                calculated = methods.fromBC(values.b, values.c);
+                            else if (values.a && values.b)
+                                calculated = methods.fromAB(values.a, values.b);
+                            else if (values.alpha)
+                                calculated = methods.fromAlpha(values.alpha);
                             break;
+                    }
+
+                    if (calculated !== undefined) {
+                        // Add a symbol behind the result if needed
+                        const symbol =
+                            target === "alpha" || target === "beta" ? "°" : "";
+
+                        // Show the result
+                        result.textContent = `${triangleInputs.find((i) => i.id === target).label} = ${calculated.toFixed(2)}${symbol}`;
+                    } else {
+                        result.textContent = `Need more info to calculate ${triangleInputs.find((i) => i.id === target).label.toLowerCase()}`;
                     }
                 } catch (error) {
                     result.textContent =
-                        "Error on line 4552.. Check your input.";
+                        "Error in calculation. Please check your input.";
                 }
             }
+
+            // Initialize the calculator
+
+            createInputFields();
+            // Adds event.listener for click on the triangle lines and
+            // triggers the calculation for the chosen value
+            document.querySelectorAll("[data-target]").forEach((element) => {
+                element.addEventListener(
+                    "click",
+                    (e) => calculate(e.target.dataset.target),
+                    // e.target - the element that was clicked
+                    // dataset is something from bootstrap - it accesses all custom data attributes
+                    // dataset.target - accesses value of our data-target attribute
+                    // so the whole thing returns the target
+                );
+            });
         </script>
     </body>
 </html>
