@@ -195,49 +195,90 @@
                 };
             }
 
+            // Trigonometry functions require angles to be in radians, so we convert our degrees into radians
+            // Of course if possible we use pythagorovka
             const calculatorMethods = {
                 a: {
                     fromBC: (b, c) => Math.sqrt(c * c - b * b),
+
                     fromBAlpha: (b, alpha) =>
                         b * Math.tan((alpha * Math.PI) / 180),
+
+                    fromCAlpha: (c, alpha) =>
+                        c * Math.sin((alpha * Math.PI) / 180),
+
+                    fromBBeta: (b, beta) =>
+                        b / Math.tan((beta * Math.PI) / 180),
+
                     fromCBeta: (c, beta) =>
                         c * Math.cos((beta * Math.PI) / 180),
                 },
                 b: {
                     fromAC: (a, c) => Math.sqrt(c * c - a * a),
+
                     fromAAlpha: (a, alpha) =>
                         a / Math.tan((alpha * Math.PI) / 180),
+
                     fromCAlpha: (c, alpha) =>
                         c * Math.cos((alpha * Math.PI) / 180),
+
+                    fromABeta: (a, beta) =>
+                        a * Math.tan((beta * Math.PI) / 180),
+
+                    fromCBeta: (c, beta) =>
+                        c * Math.sin((beta * Math.PI) / 180),
                 },
                 c: {
                     fromAB: (a, b) => Math.sqrt(a * a + b * b),
+
                     fromAAlpha: (a, alpha) =>
                         a / Math.sin((alpha * Math.PI) / 180),
+
+                    fromBAlpha: (a, alpha) =>
+                        b / Math.cos((alpha * Math.PI) / 180),
+
                     fromBBeta: (b, beta) =>
-                        b / Math.cos((beta * Math.PI) / 180),
+                        b / Math.sin((beta * Math.PI) / 180),
+
+                    fromABeta: (a, beta) =>
+                        a / Math.cos((beta * Math.PI) / 180),
                 },
                 alpha: {
                     fromAB: (a, b) => (Math.atan(a / b) * 180) / Math.PI,
                     fromAC: (a, c) => (Math.asin(a / c) * 180) / Math.PI,
+                    fromBC: (b, c) => (Math.acos(b / c) * 180) / Math.PI,
                     fromBeta: (beta) => 90 - beta,
+
+                    fromCBeta: (c, beta) =>
+                        (Math.asin(c * Math.sin((beta * Math.PI) / 180)) *
+                            180) /
+                        Math.PI,
                 },
                 beta: {
-                    fromBC: (b, c) => (Math.acos(b / c) * 180) / Math.PI,
+                    fromBC: (b, c) => (Math.asin(b / c) * 180) / Math.PI,
                     fromAB: (a, b) => (Math.atan(b / a) * 180) / Math.PI,
+                    fromAC: (a, c) => (Math.acos(a / c) * 180) / Math.PI,
                     fromAlpha: (alpha) => 90 - alpha,
+
+                    fromCAlpha: (c, alpha) =>
+                        (Math.acos(c * Math.cos((alpha * Math.PI) / 180)) *
+                            180) /
+                        Math.PI,
                 },
             };
 
+            // Main calculation function
             function calculate(target) {
                 const values = getInputValues();
                 const result = document.getElementById("result");
-                result.style.display = "block";
+                result.style.display = "block"; // Make the result element visible
 
                 try {
+                    // We declare a constant to shorten our code and make our lives easier
                     const methods = calculatorMethods[target];
                     let calculated;
 
+                    // We decide how to solve our target here
                     switch (target) {
                         case "a":
                             if (values.b && values.c)
@@ -252,7 +293,13 @@
                                     values.c,
                                     values.beta,
                                 );
+                            else if (values.b && values.beta)
+                                calculated = methods.fromABeta(
+                                    values.b,
+                                    values.beta,
+                                );
                             break;
+
                         case "b":
                             if (values.a && values.c)
                                 calculated = methods.fromAC(values.a, values.c);
@@ -266,7 +313,13 @@
                                     values.c,
                                     values.alpha,
                                 );
+                            else if (values.a && values.beta)
+                                calculated = methods.fromABeta(
+                                    values.a,
+                                    values.beta,
+                                );
                             break;
+
                         case "c":
                             if (values.a && values.b)
                                 calculated = methods.fromAB(values.a, values.b);
@@ -280,7 +333,13 @@
                                     values.b,
                                     values.beta,
                                 );
+                            else if (values.a && values.beta)
+                                calculated = methods.fromABeta(
+                                    values.a,
+                                    values.beta,
+                                );
                             break;
+
                         case "alpha":
                             if (values.a && values.b)
                                 calculated = methods.fromAB(values.a, values.b);
@@ -288,7 +347,13 @@
                                 calculated = methods.fromAC(values.a, values.c);
                             else if (values.beta)
                                 calculated = methods.fromBeta(values.beta);
+                            else if (values.c && values.beta)
+                                calculated = methods.fromCBeta(
+                                    values.c,
+                                    values.beta,
+                                );
                             break;
+
                         case "beta":
                             if (values.b && values.c)
                                 calculated = methods.fromBC(values.b, values.c);
@@ -296,6 +361,11 @@
                                 calculated = methods.fromAB(values.a, values.b);
                             else if (values.alpha)
                                 calculated = methods.fromAlpha(values.alpha);
+                            else if (values.c && values.alpha)
+                                calculated = methods.fromACAlpha(
+                                    values.c,
+                                    values.alpha,
+                                );
                             break;
                     }
 
