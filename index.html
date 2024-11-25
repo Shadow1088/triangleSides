@@ -273,6 +273,11 @@
                 const result = document.getElementById("result");
                 result.style.display = "block"; // Make the result element visible
 
+                if (values[target]) {
+                    result.textContent = `${triangleInputs.find((i) => i.id === target).label} is already known: ${values[target].toFixed(2)}`;
+                    return; // Exit the function
+                }
+
                 try {
                     // We declare a constant to shorten our code and make our lives easier
                     const methods = calculatorMethods[target];
@@ -281,91 +286,115 @@
                     // We decide how to solve our target here
                     switch (target) {
                         case "a":
-                            if (values.b && values.c)
+                            if (values.b && values.c) {
                                 calculated = methods.fromBC(values.b, values.c);
-                            else if (values.b && values.alpha)
+                            } else if (values.b && values.alpha) {
                                 calculated = methods.fromBAlpha(
                                     values.b,
                                     values.alpha,
                                 );
-                            else if (values.c && values.beta)
-                                calculated = methods.fromCBeta(
-                                    values.c,
-                                    values.beta,
-                                );
-                            else if (values.b && values.beta)
-                                calculated = methods.fromABeta(
-                                    values.b,
-                                    values.beta,
-                                );
-                            break;
-
-                        case "b":
-                            if (values.a && values.c)
-                                calculated = methods.fromAC(values.a, values.c);
-                            else if (values.a && values.alpha)
-                                calculated = methods.fromAAlpha(
-                                    values.a,
-                                    values.alpha,
-                                );
-                            else if (values.c && values.alpha)
+                            } else if (values.c && values.alpha) {
                                 calculated = methods.fromCAlpha(
                                     values.c,
                                     values.alpha,
                                 );
-                            else if (values.a && values.beta)
-                                calculated = methods.fromABeta(
-                                    values.a,
-                                    values.beta,
-                                );
-                            break;
-
-                        case "c":
-                            if (values.a && values.b)
-                                calculated = methods.fromAB(values.a, values.b);
-                            else if (values.a && values.alpha)
-                                calculated = methods.fromAAlpha(
-                                    values.a,
-                                    values.alpha,
-                                );
-                            else if (values.b && values.beta)
+                            } else if (values.b && values.beta) {
                                 calculated = methods.fromBBeta(
                                     values.b,
                                     values.beta,
                                 );
-                            else if (values.a && values.beta)
-                                calculated = methods.fromABeta(
-                                    values.a,
-                                    values.beta,
-                                );
-                            break;
-
-                        case "alpha":
-                            if (values.a && values.b)
-                                calculated = methods.fromAB(values.a, values.b);
-                            else if (values.a && values.c)
-                                calculated = methods.fromAC(values.a, values.c);
-                            else if (values.beta)
-                                calculated = methods.fromBeta(values.beta);
-                            else if (values.c && values.beta)
+                            } else if (values.c && values.beta) {
                                 calculated = methods.fromCBeta(
                                     values.c,
                                     values.beta,
                                 );
+                            }
                             break;
 
-                        case "beta":
-                            if (values.b && values.c)
-                                calculated = methods.fromBC(values.b, values.c);
-                            else if (values.a && values.b)
-                                calculated = methods.fromAB(values.a, values.b);
-                            else if (values.alpha)
-                                calculated = methods.fromAlpha(values.alpha);
-                            else if (values.c && values.alpha)
-                                calculated = methods.fromACAlpha(
+                        case "b":
+                            if (values.a && values.c) {
+                                calculated = methods.fromAC(values.a, values.c);
+                            } else if (values.a && values.alpha) {
+                                calculated = methods.fromAAlpha(
+                                    values.a,
+                                    values.alpha,
+                                );
+                            } else if (values.c && values.alpha) {
+                                calculated = methods.fromCAlpha(
                                     values.c,
                                     values.alpha,
                                 );
+                            } else if (values.a && values.beta) {
+                                calculated = methods.fromABeta(
+                                    values.a,
+                                    values.beta,
+                                );
+                            } else if (values.c && values.beta) {
+                                calculated = methods.fromCBeta(
+                                    values.c,
+                                    values.beta,
+                                );
+                            }
+                            break;
+
+                        case "c":
+                            if (values.a && values.b) {
+                                calculated = methods.fromAB(values.a, values.b);
+                            } else if (values.a && values.alpha) {
+                                calculated = methods.fromAAlpha(
+                                    values.a,
+                                    values.alpha,
+                                );
+                            } else if (values.b && values.alpha) {
+                                calculated = methods.fromBAlpha(
+                                    values.b,
+                                    values.alpha,
+                                );
+                            } else if (values.b && values.beta) {
+                                calculated = methods.fromBBeta(
+                                    values.b,
+                                    values.beta,
+                                );
+                            } else if (values.a && values.beta) {
+                                calculated = methods.fromABeta(
+                                    values.a,
+                                    values.beta,
+                                );
+                            }
+                            break;
+
+                        case "alpha":
+                            if (values.a && values.b) {
+                                calculated = methods.fromAB(values.a, values.b);
+                            } else if (values.a && values.c) {
+                                calculated = methods.fromAC(values.a, values.c);
+                            } else if (values.b && values.c) {
+                                calculated = methods.fromBC(values.b, values.c);
+                            } else if (values.beta) {
+                                calculated = methods.fromBeta(values.beta);
+                            } else if (values.c && values.beta) {
+                                calculated = methods.fromCBeta(
+                                    values.c,
+                                    values.beta,
+                                );
+                            }
+                            break;
+
+                        case "beta":
+                            if (values.b && values.c) {
+                                calculated = methods.fromBC(values.b, values.c);
+                            } else if (values.a && values.b) {
+                                calculated = methods.fromAB(values.a, values.b);
+                            } else if (values.a && values.c) {
+                                calculated = methods.fromAC(values.a, values.c);
+                            } else if (values.alpha) {
+                                calculated = methods.fromAlpha(values.alpha);
+                            } else if (values.c && values.alpha) {
+                                calculated = methods.fromCAlpha(
+                                    values.c,
+                                    values.alpha,
+                                );
+                            }
                             break;
                     }
 
